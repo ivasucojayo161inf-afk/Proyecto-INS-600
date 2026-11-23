@@ -1,0 +1,964 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PROYECTO | Panel de control</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --surface: #121821;
+            --surface-2: #18212c;
+            --line: #24303d;
+            --line-soft: #1c2632;
+            --text: #e6edf3;
+            --muted: #7d8b9a;
+            --accent: #f59e0b;
+            --accent-2: #10b981;
+            --danger: #ef4444;
+            --radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background:
+                radial-gradient(1200px 600px at 10% -10%, rgba(245, 158, 11, 0.08), transparent 60%),
+                radial-gradient(900px 500px at 100% 0%, rgba(16, 185, 129, 0.06), transparent 55%),
+                var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 28px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 26px;
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--line-soft);
+        }
+
+        .marca {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #d97706);
+            display: grid;
+            place-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: #0b0f14;
+            font-size: 18px;
+            box-shadow: 0 6px 18px -6px rgba(245, 158, 11, 0.6);
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        header .sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .conexion {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            transition: all 0.25s ease;
+        }
+
+        .conexion .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--muted);
+        }
+
+        .conexion.ok {
+            color: var(--accent-2);
+            border-color: rgba(16, 185, 129, 0.35);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .conexion.ok .dot {
+            background: var(--accent-2);
+            animation: pulse 1.8s infinite;
+        }
+
+        .conexion.off {
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .conexion.off .dot {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .contenedor {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.35), transparent);
+            opacity: 0.6;
+        }
+
+        .panel h2 {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel h2::before {
+            content: "";
+            width: 3px;
+            height: 13px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .camara-wrap {
+            position: relative;
+            background: #05080c;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16 / 10;
+        }
+
+        .camara {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            background: #05080c;
+        }
+
+        .camara-wrap::after {
+            content: "LIVE";
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: #fff;
+            background: rgba(239, 68, 68, 0.85);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .estado {
+            padding: 16px 18px;
+            border-radius: 8px;
+            background: var(--surface-2);
+            border-left: 3px solid var(--accent);
+            font-weight: 600;
+            font-size: 14px;
+            margin: 16px 0;
+            color: var(--text);
+            letter-spacing: 0.01em;
+        }
+
+        /* ALERTA LATERAL DE FATIGA */
+        .alerta-fatiga {
+            display: none;
+            background: rgba(127, 29, 29, 0.25);
+            border: 2px solid #ff2525;
+            border-radius: 10px;
+            padding: 20px;
+            animation: alertaPulso 1s infinite alternate;
+        }
+
+        .alerta-fatiga.activa {
+            display: block;
+        }
+
+        .alerta-encabezado {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ff4545;
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .alerta-icono {
+            font-size: 26px;
+        }
+
+        .alerta-titulo {
+            color: #ff2525;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .alerta-descripcion {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .alerta-sonora {
+            margin-top: 12px;
+            color: #ffaaaa;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        @keyframes alertaPulso {
+            from {
+                border-color: #ff2525;
+                box-shadow: 0 0 5px rgba(255, 37, 37, 0.2);
+            }
+            to {
+                border-color: #ff7777;
+                box-shadow: 0 0 16px rgba(255, 37, 37, 0.5);
+            }
+        }
+
+        .indicadores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .indicador {
+            background: var(--bg);
+            border: 1px solid var(--line-soft);
+            padding: 14px 16px;
+            border-radius: 8px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .indicador:hover {
+            border-color: var(--line);
+            transform: translateY(-1px);
+        }
+
+        .indicador p {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .indicador strong {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 8px;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .indicador:nth-child(1) strong { color: #60a5fa; }
+        .indicador:nth-child(2) strong { color: var(--accent); }
+        .indicador:nth-child(3) strong { color: #c084fc; }
+        .indicador:nth-child(4) strong { color: var(--accent-2); font-size: 16px; }
+
+        .configuracion {
+            margin-top: 22px;
+        }
+
+        aside {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        aside .panel:first-child p {
+            color: var(--muted);
+            font-size: 13.5px;
+            margin-bottom: 4px;
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            margin-top: 7px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            color: var(--text);
+            border-radius: 7px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface-2);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #1f2a37;
+            border-color: #33414f;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.calibrar {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #1a1204;
+        }
+
+        button.calibrar:hover {
+            background: #fbbf24;
+            border-color: #fbbf24;
+        }
+
+        button.sonido {
+            background: #263445;
+            border-color: #42536a;
+            color: white;
+        }
+
+        button.sonido.activo {
+            background: #065f46;
+            border-color: #10b981;
+        }
+
+        .mensaje {
+            margin-top: 12px;
+            color: var(--accent-2);
+            font-size: 12.5px;
+            font-weight: 500;
+            min-height: 18px;
+        }
+
+        @media (max-width: 980px) {
+            .indicadores {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 850px) {
+            body { padding: 18px; }
+            .contenedor { grid-template-columns: 1fr; }
+            header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="marca">
+        <div class="logo">P</div>
+        <div>
+            <h1>PROYECTO</h1>
+            <p class="sub">Sistema de monitoreo de conductor</p>
+        </div>
+    </div>
+
+    <div class="conexion" id="conexion">
+        <span class="dot"></span>
+        <span id="conexionTexto">Conectando...</span>
+    </div>
+</header>
+
+<main class="contenedor">
+
+    <section class="panel">
+
+        <h2>Monitor de cámara</h2>
+
+        <div class="camara-wrap">
+            <img
+                class="camara"
+                src="/video_feed"
+                alt="Video de la cámara"
+            >
+        </div>
+
+        <div class="estado" id="estado">
+            Esperando información...
+        </div>
+
+        <div class="indicadores">
+
+            <div class="indicador">
+                <p>EAR promedio</p>
+                <strong id="ear">--</strong>
+            </div>
+
+            <div class="indicador">
+                <p>Yaw</p>
+                <strong id="yaw">--</strong>
+            </div>
+
+            <div class="indicador">
+                <p>Pitch</p>
+                <strong id="pitch">--</strong>
+            </div>
+
+            <div class="indicador">
+                <p>Estado del sistema</p>
+                <strong id="sistema">--</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+    <aside>
+
+        <!-- PANEL DE ALERTAS -->
+        <section class="panel">
+
+            <h2>Alertas del sistema</h2>
+
+            <div id="alertaFatiga" class="alerta-fatiga">
+
+                <div class="alerta-encabezado">
+                    <span class="alerta-icono">⚠</span>
+                    FATIGA DETECTADA
+                </div>
+
+                <div class="alerta-titulo">
+                    ¡ALERTA!
+                </div>
+
+                <p class="alerta-descripcion">
+                    Se ha detectado un cierre prolongado de ojos.
+                </p>
+
+                <p class="alerta-sonora" id="textoAlertaSonora">
+                    Alerta visual activa.
+                </p>
+
+            </div>
+
+            <button
+                id="btnSonido"
+                class="sonido"
+                onclick="activarSonido()">
+                Activar sonido
+            </button>
+
+            <p class="mensaje" id="estadoSonido">
+                Activa el sonido para recibir alertas auditivas.
+            </p>
+
+        </section>
+
+        <!-- PANEL DE CALIBRACIÓN -->
+        <section class="panel">
+
+            <h2>Calibración</h2>
+
+            <p>
+                La calibración guiada ajusta automáticamente
+                los parámetros del conductor en tres fases.
+            </p>
+
+            <button class="calibrar" id="btnCalibrar" onclick="calibrar()">
+                Iniciar calibración
+            </button>
+
+            <div id="panelCalibracion" style="display:none; margin-top:16px;">
+
+                <strong id="faseCalibracion">Preparando...</strong>
+
+                <p id="instruccionCalibracion" class="mensaje"></p>
+
+                <div style="height:10px;background:#263241;border-radius:8px;overflow:hidden;">
+
+                    <div
+                        id="barraCalibracion"
+                        style="height:100%;width:0%;background:#10b981;transition:width .3s;">
+                    </div>
+
+                </div>
+
+                <p id="porcentajeCalibracion" class="mensaje">0%</p>
+
+            </div>
+
+            <p class="mensaje" id="mensajeCalibracion"></p>
+
+        </section>
+
+        <!-- PANEL DE CONFIGURACIÓN -->
+        <section class="panel configuracion">
+
+            <h2>Configuración</h2>
+
+            <label>
+                Umbral EAR
+                <input type="number" id="umbralEAR"
+                    min="0.05" max="0.50" step="0.01" value="0.21">
+            </label>
+
+            <label>
+                Umbral Yaw
+                <input type="number" id="umbralYaw"
+                    min="5" max="90" step="1" value="20">
+            </label>
+
+            <label>
+                Umbral Pitch
+                <input type="number" id="umbralPitch"
+                    min="5" max="90" step="1" value="20">
+            </label>
+
+            <label>
+                Tiempo de cierre (s)
+                <input type="number" id="tiempoCierre"
+                    min="0.5" max="10" step="0.1" value="2">
+            </label>
+
+            <label>
+                Tiempo de distracción (s)
+                <input type="number" id="tiempoDistraccion"
+                    min="0.5" max="10" step="0.1" value="2">
+            </label>
+
+            <button onclick="guardarConfiguracion()">
+                Guardar configuración
+            </button>
+
+            <p class="mensaje" id="mensajeConfiguracion"></p>
+
+        </section>
+
+    </aside>
+
+</main>
+
+<script>
+
+// =====================================
+// SISTEMA DE ALERTA SONORA
+// =====================================
+
+let contextoAudio = null;
+let sonidoActivado = false;
+let alertaFatigaAnterior = false;
+
+
+async function activarSonido() {
+
+    try {
+
+        if (!contextoAudio) {
+
+            contextoAudio = new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+        }
+
+        await contextoAudio.resume();
+
+        sonidoActivado = true;
+
+        const boton = document.getElementById("btnSonido");
+
+        boton.textContent = "Sonido activado";
+        boton.classList.add("activo");
+
+        document.getElementById("estadoSonido").textContent =
+            "Las alertas sonoras están habilitadas.";
+
+        if (alertaFatigaAnterior) {
+            reproducirPitido();
+        }
+
+    } catch (error) {
+
+        document.getElementById("estadoSonido").textContent =
+            "No se pudo activar el sonido.";
+
+    }
+}
+
+
+function reproducirPitido() {
+
+    if (!sonidoActivado || !contextoAudio) {
+        return;
+    }
+
+    const ahora = contextoAudio.currentTime;
+
+    // Dos pitidos cortos
+    for (let i = 0; i < 2; i++) {
+
+        const oscilador = contextoAudio.createOscillator();
+        const volumen = contextoAudio.createGain();
+
+        oscilador.type = "sine";
+        oscilador.frequency.value = 880;
+
+        volumen.gain.setValueAtTime(
+            0.0001,
+            ahora + i * 0.25
+        );
+
+        volumen.gain.exponentialRampToValueAtTime(
+            0.25,
+            ahora + i * 0.25 + 0.02
+        );
+
+        volumen.gain.setValueAtTime(
+            0.25,
+            ahora + i * 0.25 + 0.12
+        );
+
+        volumen.gain.exponentialRampToValueAtTime(
+            0.0001,
+            ahora + i * 0.25 + 0.16
+        );
+
+        oscilador.connect(volumen);
+        volumen.connect(contextoAudio.destination);
+
+        oscilador.start(ahora + i * 0.25);
+        oscilador.stop(ahora + i * 0.25 + 0.17);
+
+    }
+}
+
+
+// =====================================
+// ACTUALIZAR ESTADO DEL SISTEMA
+// =====================================
+
+async function actualizarEstado() {
+
+    const conexion = document.getElementById("conexion");
+    const conexionTexto = document.getElementById("conexionTexto");
+
+    try {
+
+        const respuesta = await fetch("/api/estado");
+
+        if (!respuesta.ok) {
+            throw new Error("Error del servidor");
+        }
+
+        const datos = await respuesta.json();
+
+        conexion.classList.remove("off");
+        conexion.classList.add("ok");
+
+        conexionTexto.textContent = "Conectado";
+
+        document.getElementById("estado").textContent =
+            datos.estado || "Sin información";
+
+        document.getElementById("ear").textContent =
+            datos.ear ?? "--";
+
+        document.getElementById("yaw").textContent =
+            datos.yaw ?? "--";
+
+        document.getElementById("pitch").textContent =
+            datos.pitch ?? "--";
+
+        document.getElementById("sistema").textContent =
+            datos.sistema || "--";
+
+
+        // =====================================
+        // ACTUALIZAR ALERTA DE FATIGA
+        // =====================================
+
+        const alertaFatiga = Boolean(datos.alerta_fatiga);
+
+        const panelAlerta = document.getElementById("alertaFatiga");
+
+        panelAlerta.classList.toggle(
+            "activa",
+            alertaFatiga
+        );
+
+        const textoAlertaSonora =
+            document.getElementById("textoAlertaSonora");
+
+        textoAlertaSonora.textContent = alertaFatiga
+            ? "Cierre prolongado de ojos detectado."
+            : "Alerta visual activa.";
+
+        // El pitido se reproduce solo al activarse la alerta.
+        if (alertaFatiga && !alertaFatigaAnterior) {
+            reproducirPitido();
+        }
+
+        alertaFatigaAnterior = alertaFatiga;
+
+
+        // =====================================
+        // ACTUALIZAR CALIBRACIÓN
+        // =====================================
+
+        const panel = document.getElementById("panelCalibracion");
+
+        panel.style.display = datos.calibracion_activa
+            ? "block"
+            : "none";
+
+        if (datos.calibracion_activa) {
+
+            document.getElementById("faseCalibracion").textContent =
+                datos.calibracion_fase || "Calibrando";
+
+            document.getElementById("instruccionCalibracion").textContent =
+                datos.calibracion_instruccion || "Sigue las indicaciones";
+
+            document.getElementById("barraCalibracion").style.width =
+                (datos.calibracion_progreso || 0) + "%";
+
+            document.getElementById("porcentajeCalibracion").textContent =
+                (datos.calibracion_progreso || 0) + "%";
+
+        } else if (
+            (datos.estado || "").toLowerCase().includes("calibración exitosa")
+        ) {
+
+            document.getElementById("mensajeCalibracion").textContent =
+                datos.estado;
+
+        } else if (
+            (datos.estado || "").toLowerCase().includes("no se capturaron") ||
+            (datos.estado || "").toLowerCase().includes("no se distinguió")
+        ) {
+
+            document.getElementById("mensajeCalibracion").textContent =
+                datos.estado;
+
+        }
+
+    } catch (error) {
+
+        conexion.classList.remove("ok");
+        conexion.classList.add("off");
+
+        conexionTexto.textContent = "Sin conexión";
+
+    }
+
+}
+
+
+// =====================================
+// INICIAR CALIBRACIÓN
+// =====================================
+
+async function calibrar() {
+
+    const boton = document.getElementById("btnCalibrar");
+
+    boton.disabled = true;
+
+    document.getElementById("mensajeCalibracion").textContent = "";
+
+    try {
+
+        const respuesta = await fetch("/api/calibrar", {
+            method: "POST"
+        });
+
+        const datos = await respuesta.json();
+
+        document.getElementById("mensajeCalibracion").textContent =
+            datos.mensaje;
+
+    } catch (error) {
+
+        document.getElementById("mensajeCalibracion").textContent =
+            "No se pudo iniciar la calibración.";
+
+    } finally {
+
+        setTimeout(() => {
+            boton.disabled = false;
+        }, 1500);
+
+    }
+
+}
+
+
+// =====================================
+// GUARDAR CONFIGURACIÓN
+// =====================================
+
+async function guardarConfiguracion() {
+
+    const configuracion = {
+
+        umbral_ear: Number(
+            document.getElementById("umbralEAR").value
+        ),
+
+        umbral_yaw: Number(
+            document.getElementById("umbralYaw").value
+        ),
+
+        umbral_pitch: Number(
+            document.getElementById("umbralPitch").value
+        ),
+
+        tiempo_cierre: Number(
+            document.getElementById("tiempoCierre").value
+        ),
+
+        tiempo_distraccion: Number(
+            document.getElementById("tiempoDistraccion").value
+        )
+
+    };
+
+    try {
+
+        const respuesta = await fetch("/api/configuracion", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(configuracion)
+
+        });
+
+        const datos = await respuesta.json();
+
+        document.getElementById("mensajeConfiguracion").textContent =
+            datos.mensaje;
+
+    } catch (error) {
+
+        document.getElementById("mensajeConfiguracion").textContent =
+            "No se pudo actualizar la configuración.";
+
+    }
+
+}
+
+
+// =====================================
+// INICIAR ACTUALIZACIÓN DEL DASHBOARD
+// =====================================
+
+actualizarEstado();
+
+setInterval(actualizarEstado, 500);
+
+</script>
+
+</body>
+</html>
